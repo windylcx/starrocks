@@ -14,13 +14,9 @@
 
 package com.starrocks.analysis;
 
-<<<<<<< HEAD
-import com.starrocks.alter.AlterJobMgr;
-=======
 import com.google.common.collect.ImmutableList;
-import com.starrocks.alter.AlterMVJobExecutor;
+import com.starrocks.alter.AlterJobMgr;
 import com.starrocks.catalog.Column;
->>>>>>> d80283657f ([BugFix] check the schema when trying to activate the mv (#32698))
 import com.starrocks.catalog.MaterializedView;
 import com.starrocks.common.AnalysisException;
 import com.starrocks.common.DdlException;
@@ -199,20 +195,14 @@ public class AlterMaterializedViewTest {
         // alter the view to a different type, cause MV inactive
         connectContext.executeSql("alter view view1 as select v1, avg(v2) as k2 from t0 group by v1");
         Assert.assertFalse(mv.isActive());
-        Assert.assertEquals("base view view1 changed", mv.getInactiveReason());
 
         // try to active the mv
         connectContext.executeSql(String.format("alter materialized view %s active", mvName));
         Assert.assertFalse(mv.isActive());
-        Assert.assertEquals("mv schema changed: " +
-                "[[`k2` bigint(20) NULL COMMENT \"\", `v1` bigint(20) NULL COMMENT \"\"]] " +
-                "does not match " +
-                "[[`k2` double NULL COMMENT \"\", `v1` bigint(20) NULL COMMENT \"\"]]", mv.getInactiveReason());
 
         // use a illegal view schema, should active the mv correctly
         connectContext.executeSql("alter view view1 as select v1, max(v2) as k2 from t0 group by v1");
         connectContext.executeSql(String.format("alter materialized view %s active", mvName));
         Assert.assertTrue(mv.isActive());
-        Assert.assertNull(mv.getInactiveReason());
     }
 }
